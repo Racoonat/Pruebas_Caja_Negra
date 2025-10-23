@@ -24,7 +24,7 @@ class AlienTest {
     }
     // -------------------- Constructor Alien---------------
     @Test
-    @DisplayName("Constructor: El constructor de Alien inicializa posición, imagen y bomba destruida")
+    @DisplayName("Constructor: El constructor de Alien se inicializa")
     void constructorInitializesState() {
         // GIVEN
         int x = 100;
