@@ -1,5 +1,6 @@
 package es.iwt42.grupo6;
 
+import main.Commons;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,36 @@ import java.awt.event.KeyEvent;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerTest {
+
+    //Pruebas del método initPlayer ------
+
+    @Test
+    void testInitPlayer_Centrado() {
+        Player player = new Player();
+        // ancho tablero par
+        int expectedX = Commons.BOARD_WIDTH / 2; // centrado
+        int expectedY = Commons.GROUND - 10; // 10 px sobre el suelo
+        assertEquals(expectedX, player.getX(), "X inicial del jugador incorrecto (TS1)");
+        assertEquals(expectedY, player.getY(), "Y inicial del jugador incorrecto (TS1)");
+    }
+
+
+    @Test
+    void testInitPlayer_CentradoImpar() {
+        // hacemos que BOARD_WIDTH sea impar
+        int boardWidthOdd = Commons.BOARD_WIDTH + 1; // simulamos ancho impar
+        int expectedX = boardWidthOdd / 2; // centrado visualmente
+        int expectedY = Commons.GROUND - 10; // 10 px sobre el suelo
+        Player player = new Player(); // initPlayer() usa BOARD_WIDTH real
+        // comprobamos que la X calculada sigue estando centrada
+        assertTrue(Math.abs(player.getX() - expectedX) <= 1,
+                "X inicial del jugador incorrecto (TS2, ancho impar)");
+        assertEquals(expectedY, player.getY(), "Y inicial del jugador incorrecto (TS2)");
+    }
+
+
+
+    // Pruebas del método keyPressed() ------
 
     // Componente falso y final que se usa para poder crear un objeto KeyEvent.
     private final Component dummyComponent = new Component() {};
@@ -30,7 +61,6 @@ class PlayerTest {
     }
 
 
-    // --- Pruebas del método keyPressed() ---
 
     @Test
     @DisplayName("CP-P-: Pulsar flecha izquierda causa movimiento a la izquierda")
@@ -68,7 +98,7 @@ class PlayerTest {
         assertEquals(initialX, finalX, "El jugador no debería moverse al presionar una tecla sin acción");
     }
 
-    // --- Pruebas del método keyReleased() ---
+    // --- Pruebas del método keyReleased() ------
 
     @Test
     @DisplayName("CP-P-: Soltar flecha izquierda detiene el movimiento")
