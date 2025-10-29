@@ -1,139 +1,214 @@
 package es.iwt42.grupo6;
 
 import main.Commons;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import space_invaders.sprites.Alien;
 
-import java.awt.*;
+import java.awt.Image;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.params.provider.Arguments;
 
 class AlienTest {
-    private static final int W = Commons.BOARD_WIDTH;
-    private static final int H = Commons.BOARD_HEIGHT;
 
-    @BeforeEach
-    void setUp() {
-    }
+    // Atajos para constantes del tablero
+    private static final int W = Commons.BOARD_WIDTH;   // 358 en el informe
+    private static final int H = Commons.BOARD_HEIGHT;  // 350 en el informe
 
-    @AfterEach
-    void tearDown() {
-    }
-    // -------------------- Constructor Alien---------------
-    @Test
-    @DisplayName("Constructor: El constructor de Alien se inicializa")
-    void constructorInitializesState() {
-        // GIVEN
-        int x = 100;
-        int y = 200;
+    // ---------------------------------------------------------------------
+    // CP-A-00  (Constructor: new Alien(x,y) inicializa estado base)
+    // ---------------------------------------------------------------------
+    @ParameterizedTest(name = "CP-A-00: Constructor Alien({0},{1}) inicializa bomba y estado visible")
+    @CsvSource({
+            "100,200",
+            "0,0",
+            "150,10"
+    })
+    @DisplayName("CP-A-00: Inicialización del Alien y su bomba")
+    void cp_a_00_constructorInitializesState(int x, int y) {
 
-        // WHEN
         Alien alien = new Alien(x, y);
 
-        // THEN (caja negra: usamos sólo la interfaz pública)
-        // 1) Hay instancia y la bomba existe
+        // 1) El alien existe
         assertNotNull(alien, "Alien no debería ser null");
+
+        // 2) La bomba existe
         Alien.Bomb bomb = alien.getBomb();
         assertNotNull(bomb, "La bomba del Alien debería estar inicializada");
 
-        // 2) La posición inicial es la solicitada (vía getters heredados de Sprite)
-        assertEquals(x, alien.getX(), "X inicial del Alien no coincide");
-        assertEquals(y, alien.getY(), "Y inicial del Alien no coincide");
+        // 3) La posición inicial observable coincide con la del constructor
+        //    (esto es caja negra: le pedimos getX/getY públicos)
+        assertEquals(x, alien.getX(), "X inicial del Alien no coincide con el valor pasado al constructor");
+        assertEquals(y, alien.getY(), "Y inicial del Alien no coincide con el valor pasado al constructor");
 
-        // 3) La imagen está establecida (no validamos el archivo, sólo que hay Image)
-        Image alienImg = alien.getImage();
-        assertNotNull(alienImg, "Alien debería tener imagen asignada por el constructor");
+        // 4) El alien tiene imagen
+        Image img = alien.getImage();
+        assertNotNull(img, "Alien debería tener imagen asignada al construirse");
 
-        // 4) La bomba comienza marcada como 'destroyed' según contrato observable
-        assertTrue(bomb.isDestroyed(), "La bomba debería iniciar destruida");
+        // 5) Bomba empieza destruida
+        assertTrue(bomb.isDestroyed(), "La bomba debería iniciar destruida (no activa)");
 
-        // 5) (Opcional caja negra) La bomba hereda posición del Alien al crearse
-        assertEquals(x, bomb.getX(), "X inicial de la Bomba debería coincidir con la del Alien");
-        assertEquals(y, bomb.getY(), "Y inicial de la Bomba debería coincidir con la del Alien");
+        // 6) Bomba toma las coordenadas iniciales del alien
+        assertEquals(x, bomb.getX(), "X inicial de la bomba debería coincidir con el Alien");
+        assertEquals(y, bomb.getY(), "Y inicial de la bomba debería coincidir con el Alien");
     }
 
-    // ----------------------- initAlien -----------------------
-    @Test
-    @DisplayName("initAlien: coordenadas válidas dentro de los límites")
-    void testInitAlien_ValidCoordinates() {
-        Alien alien = new Alien(300, 200);
-        assertEquals(300, alien.getX());
-        assertEquals(200, alien.getY());
+    // ---------------------------------------------------------------------
+    // CP-A-01 .. CP-A-07 (initAlien / constructor posicionando coordenadas)
+    //
+    // Casos:
+    // CP-A-01: (300,200)   -> (300,200)
+    // CP-A-02: (0,0)       -> (0,0)
+    // CP-A-03: (W,H)       -> (W,H)
+    // CP-A-04: (-10,100)   -> (0,100)
+    // CP-A-05: (100,-10)   -> (100,0)
+    // CP-A-06: (383,100)   -> (358,100)   // clamp X a W
+    // CP-A-07: (100,375)   -> (100,350)   // clamp Y a H
+    //
+    // Nota: Los últimos 3 dependen de W y H, así que vamos a usar MethodSource
+    // para poder pasar dinámicamente esos valores esperados.
+    // ---------------------------------------------------------------------
+
+    private static Stream<Arguments> cp_a_01_a_07_positionsProvider() {
+        return Stream.of(
+                // CP-A-01: Coordenadas válidas dentro de límites
+                Arguments.of("CP-A-01: válidas dentro de límites",
+                        300, 200,
+                        300, 200),
+
+                // CP-A-02: Borde exacto (0,0)
+                Arguments.of("CP-A-02: borde exacto (0,0)",
+                        0, 0,
+                        0, 0),
+
+                // CP-A-03: Borde exacto (W,H)
+                Arguments.of("CP-A-03: borde exacto (W,H)",
+                        W, H,
+                        W, H),
+
+                // CP-A-04: X negativa → clamp a 0
+                Arguments.of("CP-A-04: X negativa → clamp a 0",
+                        -10, 100,
+                        0, 100),
+
+                // CP-A-05: Y negativa → clamp a 0
+                Arguments.of("CP-A-05: Y negativa → clamp a 0",
+                        100, -10,
+                        100, 0),
+
+                // CP-A-06: X excede BOARD_WIDTH → clamp a W
+                Arguments.of("CP-A-06: X excede BOARD_WIDTH",
+                        W + 25, 100,
+                        W, 100),
+
+                // CP-A-07: Y excede BOARD_HEIGHT → clamp a H
+                Arguments.of("CP-A-07: Y excede BOARD_HEIGHT",
+                        100, H + 25,
+                        100, H)
+        );
     }
 
-    @Test @DisplayName("initAlien: X negativa -> se corrige a 0")
-    void testInitAlien_NegativeX() {
-        Alien alien = new Alien(-10, 100);
-        assertEquals(0, alien.getX());
-        assertEquals(100, alien.getY());
+    @ParameterizedTest(name = "{0}: Alien({1},{2}) ⇒ ({3},{4})")
+    @MethodSource("cp_a_01_a_07_positionsProvider")
+    @DisplayName("CP-A-01 .. CP-A-07: initAlien / constructor posiciona dentro de los límites del tablero")
+    void cp_a_01_a_07_initAlien_coordinatesAreClampedAsExpected(
+            String label,
+            int givenX,
+            int givenY,
+            int expectedX,
+            int expectedY
+    ) {
+        Alien alien = new Alien(givenX, givenY);
+
+        assertEquals(expectedX, alien.getX(),
+                label + " → X final incorrecta (esperada " + expectedX + ")");
+        assertEquals(expectedY, alien.getY(),
+                label + " → Y final incorrecta (esperada " + expectedY + ")");
     }
 
-    @Test @DisplayName("initAlien: Y negativa -> se corrige a 0")
-    void testInitAlien_NegativeY() {
-        Alien alien = new Alien(100, -10);
-        assertEquals(100, alien.getX());
-        assertEquals(0, alien.getY());
+    // ---------------------------------------------------------------------
+    // CP-A-08 .. CP-A-10 (act(int direction) con UNA sola llamada)
+    //
+    // CP-A-08: direction = 0,   start(100,200) → (100,200)
+    // CP-A-09: direction = +20, start(100,200) → (120,200)
+    // CP-A-10: direction = -10, start(100,200) → (90,200)
+    //
+    // Estas son variaciones del mismo patrón, así que usamos CsvSource
+    // ---------------------------------------------------------------------
+
+    @ParameterizedTest(
+            name = "{0}: Alien({1},{2}).act({3}) ⇒ ({4},{5})"
+    )
+    @CsvSource({
+            // label,       startX, startY, direction, expectedX, expectedY
+            "'CP-A-08: sin movimiento',           100, 200, 0,    100, 200",
+            "'CP-A-09: movimiento a la derecha',  100, 200, 20,   120, 200",
+            "'CP-A-10: movimiento a la izquierda',100, 200, -10,  90,  200"
+    })
+    @DisplayName("CP-A-08 .. CP-A-10: act(direction) con una sola invocación")
+    void cp_a_08_a_10_act_singleStep(
+            String label,
+            int startX,
+            int startY,
+            int direction,
+            int expectedX,
+            int expectedY
+    ) {
+        Alien alien = new Alien(startX, startY);
+
+        alien.act(direction);
+
+        assertEquals(expectedX, alien.getX(),
+                label + " → X final incorrecta tras act(" + direction + ")");
+        assertEquals(expectedY, alien.getY(),
+                label + " → Y final incorrecta tras act(" + direction + ")");
     }
 
-    @Test @DisplayName("initAlien: X excede límite -> clamp a BOARD_WIDTH")
-    void testInitAlien_InvalidCoordinatesX() {
-        Alien alien = new Alien(W + 25, 100);
-        assertEquals(W, alien.getX());
-        assertEquals(100, alien.getY());
+    // ---------------------------------------------------------------------
+    // CP-A-11 (Secuencia de movimientos)
+    //
+    // CP-A-11: start(70,120), act(+3) luego act(-5) → (68,120)
+    //
+    // Es conceptualmente distinto porque hay dos llamadas consecutivas,
+    // así que le damos su propio MethodSource de un único caso para
+    // seguir cumpliendo "parametrizado".
+    // ---------------------------------------------------------------------
+
+    private static Stream<Arguments> cp_a_11_sequenceProvider() {
+        return Stream.of(
+                Arguments.of(
+                        "CP-A-11: Secuencia (+3, luego -5)",
+                        70, 120,    // startX, startY
+                        3, -5,      // firstDir, secondDir
+                        68, 120     // expectedX, expectedY
+                )
+        );
     }
 
-    @Test @DisplayName("initAlien: Y excede límite -> clamp a BOARD_HEIGHT")
-    void testInitAlien_InvalidCoordinatesY() {
-        Alien alien = new Alien(100, H + 25);
-        assertEquals(100, alien.getX());
-        assertEquals(H, alien.getY());
-    }
+    @ParameterizedTest(name = "{0}: start({1},{2}) -> act({3}) luego act({4}) ⇒ ({5},{6})")
+    @MethodSource("cp_a_11_sequenceProvider")
+    @DisplayName("CP-A-11: Secuencia de movimientos (+3, luego -5)")
+    void cp_a_11_act_sequence(
+            String label,
+            int startX,
+            int startY,
+            int firstDir,
+            int secondDir,
+            int expectedX,
+            int expectedY
+    ) {
+        Alien alien = new Alien(startX, startY);
 
-    @Test @DisplayName("initAlien: bordes exactos (0,0) y (W,H) se mantienen")
-    void testInitAlien_ExactBorders() {
-        Alien a1 = new Alien(0, 0);
-        assertEquals(0, a1.getX());
-        assertEquals(0, a1.getY());
+        alien.act(firstDir);   // e.g. +3
+        alien.act(secondDir);  // e.g. -5
 
-        Alien a2 = new Alien(W, H);
-        assertEquals(W, a2.getX());
-        assertEquals(H, a2.getY());
-    }
-
-    // ------------------------------ act(direction) ----------------------------
-    @Test @DisplayName("act: direction=0 -> sin movimiento, Y invariante")
-    void testAlienMovementZero() {
-        Alien alien = new Alien(100, 200);
-        alien.act(0);
-        assertEquals(100, alien.getX());
-        assertEquals(200, alien.getY());
-    }
-
-    @Test @DisplayName("act: derecha (+20) -> X = x0 + 20, Y constante")
-    void testAlienMovementRight() {
-        Alien alien = new Alien(100, 200);
-        alien.act(20);
-        assertEquals(120, alien.getX());
-        assertEquals(200, alien.getY());
-    }
-
-    @Test @DisplayName("act: izquierda (-10) -> X = x0 - 10, Y constante")
-    void testAlienMovementLeft() {
-        Alien alien = new Alien(100, 200);
-        alien.act(-10);
-        assertEquals(90, alien.getX());
-        assertEquals(200, alien.getY());
-    }
-
-    @Test @DisplayName("act: secuencia (+3, -5) -> X = x0 - 2, Y invariante")
-    void testAlienMovementSequence() {
-        Alien alien = new Alien(70, 120);
-        alien.act(3);
-        alien.act(-5);
-        assertEquals(68, alien.getX());
-        assertEquals(120, alien.getY());
+        assertEquals(expectedX, alien.getX(),
+                label + " → X final incorrecta tras la secuencia");
+        assertEquals(expectedY, alien.getY(),
+                label + " → Y final incorrecta tras la secuencia");
     }
 }
