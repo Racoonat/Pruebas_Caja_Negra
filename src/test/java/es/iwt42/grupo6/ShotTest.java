@@ -1,6 +1,8 @@
 package es.iwt42.grupo6;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import space_invaders.sprites.Shot;
@@ -11,6 +13,83 @@ class ShotTest implements Commons {
     private static final int H_SPACE = 6;
     private static final int V_SPACE = 1;
 
+    //------------------ Constructor -----------------
+    @ParameterizedTest(name = "CP-S-01: Shot({0},{1}) debe quedar en ({2},{3}) con imagen no nula")
+    @CsvSource({
+            "100, 200, 106, 199"
+    })
+    void cp_s_01_normal_coordinates(int x, int y, int expectedX, int expectedY) {
+        Shot s = new Shot(x, y);
+
+        assertEquals(expectedX, s.getX(),
+                "X esperada (" + expectedX + ") != getX() para entrada (" + x + "," + y + ")");
+        assertEquals(expectedY, s.getY(),
+                "Y esperada (" + expectedY + ") != getY() para entrada (" + x + "," + y + ")");
+        assertNotNull(s.getImage(),
+                "La imagen no debería ser null en CP-S-01");
+    }
+
+    @ParameterizedTest(name = "CP-S-02: Shot({0},{1}) debe quedar en ({2},{3}) con imagen no nula")
+    @CsvSource({
+            "0, 200, 6, 199"
+    })
+    void cp_s_02_left_edge(int x, int y, int expectedX, int expectedY) {
+        Shot s = new Shot(x, y);
+
+        assertEquals(expectedX, s.getX(),
+                "X esperada (" + expectedX + ") != getX() para entrada (" + x + "," + y + ")");
+        assertEquals(expectedY, s.getY(),
+                "Y esperada (" + expectedY + ") != getY() para entrada (" + x + "," + y + ")");
+        assertNotNull(s.getImage(),
+                "La imagen no debería ser null en CP-S-02");
+    }
+
+    @ParameterizedTest(name = "CP-S-03: Shot({0},{1}) debe quedar en ({2},{3}) con imagen no nula")
+    @CsvSource({
+            "50, 1, 56, 0"
+    })
+    void cp_s_03_top_edge(int x, int y, int expectedX, int expectedY) {
+        Shot s = new Shot(x, y);
+
+        assertEquals(expectedX, s.getX(),
+                "X esperada (" + expectedX + ") != getX() para entrada (" + x + "," + y + ")");
+        assertEquals(expectedY, s.getY(),
+                "Y esperada (" + expectedY + ") != getY() para entrada (" + x + "," + y + ")");
+        assertNotNull(s.getImage(),
+                "La imagen no debería ser null en CP-S-03");
+    }
+
+    @ParameterizedTest(name = "CP-S-04: Shot({0},{1}) debe quedar en ({2},{3}) con imagen no nula")
+    @CsvSource({
+            "1000, 800, 1006, 799"
+    })
+    void cp_s_04_large_coordinates(int x, int y, int expectedX, int expectedY) {
+        Shot s = new Shot(x, y);
+
+        assertEquals(expectedX, s.getX(),
+                "X esperada (" + expectedX + ") != getX() para entrada (" + x + "," + y + ")");
+        assertEquals(expectedY, s.getY(),
+                "Y esperada (" + expectedY + ") != getY() para entrada (" + x + "," + y + ")");
+        assertNotNull(s.getImage(),
+                "La imagen no debería ser null en CP-S-04");
+    }
+
+    @ParameterizedTest(name = "CP-S-05: Shot({0},{1}) debe quedar en ({2},{3}) con imagen no nula")
+    @CsvSource({
+            "-20, -10, -14, -11"
+    })
+    void cp_s_05_negative_coordinates(int x, int y, int expectedX, int expectedY) {
+        Shot s = new Shot(x, y);
+
+        assertEquals(expectedX, s.getX(),
+                "X esperada (" + expectedX + ") != getX() para entrada (" + x + "," + y + ")");
+        assertEquals(expectedY, s.getY(),
+                "Y esperada (" + expectedY + ") != getY() para entrada (" + x + "," + y + ")");
+        assertNotNull(s.getImage(),
+                "La imagen no debería ser null en CP-S-05");
+    }
+
+    //------------------ Init Shot -----------------
     @ParameterizedTest(name = "Caso {index} [{0},{1}]: {2}")
     @CsvSource({
             // Casos de prueba para el eje X
@@ -32,6 +111,8 @@ class ShotTest implements Commons {
             // Caso de prueba para valores normales
             "150, 150, 'SI10: Valores normales dentro del tablero'"
     })
+
+
     void testInitShotRobustBoundary(int x, int y) {
 
         // Posición final del disparo tras aplicar el desplazamiento
