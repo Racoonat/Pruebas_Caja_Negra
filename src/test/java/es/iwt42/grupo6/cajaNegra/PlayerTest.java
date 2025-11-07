@@ -1,4 +1,4 @@
-package es.iwt42.grupo6;
+package es.iwt42.grupo6.cajaNegra;
 
 import main.Commons;
 import org.junit.jupiter.api.AfterEach;
