@@ -14,6 +14,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerTest {
 
+     // Componente falso y final que se usa para poder crear un objeto KeyEvent.
+    private final Component dummyComponent = new Component() {};
+
+    @BeforeEach
+    void setUp() {
+    }
+
+    @AfterEach
+    void tearDown() {
+    }
+
     //Pruebas del método initPlayer ------
 
     @Test
@@ -44,22 +55,7 @@ class PlayerTest {
 
     // Pruebas del método keyPressed() ------
 
-    // Componente falso y final que se usa para poder crear un objeto KeyEvent.
-    private final Component dummyComponent = new Component() {};
-
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
-    @Test
-    void testPlayerInitialization() {
-        Player player = new Player();
-        assertNotNull(player, "El objeto Player no debería ser nulo después de la creación");
-    }
-
+   
 
 
     @Test
