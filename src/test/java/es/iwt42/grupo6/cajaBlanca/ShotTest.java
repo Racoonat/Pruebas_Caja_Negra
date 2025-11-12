@@ -18,9 +18,7 @@ class ShotTest {
         int inputX = 100;
         int inputY = 100;
 
-
         Shot shot = new Shot(inputX, inputY);
-
 
         final int H_SPACE = 6;
         final int V_SPACE = 1;
