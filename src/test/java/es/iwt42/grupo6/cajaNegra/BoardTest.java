@@ -4,7 +4,7 @@ import main.Board;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import space_invaders.sprites.Alien;
+import space_invaders.sprites.*;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -18,14 +18,6 @@ class BoardTest {
 
     private Board board;
 
-    private void tickOnce() {
-        Timer t = board.getTimer();
-        assertNotNull(t, "El Timer de Board no debería ser null");
-        ActionListener[] listeners = t.getActionListeners();
-        assertTrue(listeners.length > 0, "El Timer debería tener al menos un ActionListener");
-        listeners[0].actionPerformed(new ActionEvent(t, ActionEvent.ACTION_PERFORMED, "test"));
-    }
-
     @BeforeEach
     void setUp() {
         board = new Board();
@@ -36,6 +28,37 @@ class BoardTest {
         board.setInGame(true);
         board.setDirection(-1);
         board.setDeaths(0);
+    }
+
+    @Test
+    void initBoardTest() {
+
+        assertNotNull(board, "El objeto Board no debe ser nulo");
+
+        // Validar que los componentes principales estén inicializados
+        assertNotNull(board.getAliens(), "La lista de aliens debe estar inicializada");
+        assertNotNull(board.getPlayer(), "El jugador debe estar inicializado");
+        assertNotNull(board.getShot(), "El disparo debe estar inicializado");
+
+        // Verificar cantidad inicial de aliens
+        assertEquals(24, board.getAliens().size(), "Debe haber 24 aliens iniciales (4x6)");
+
+        // Verificar tipo de objetos
+        for (Object obj : board.getAliens()) {
+            assertInstanceOf(Alien.class, obj, "Cada elemento debe ser un Alien");
+        }
+
+        // El jugador y disparo deben existir
+        assertInstanceOf(Player.class, board.getPlayer(), "Debe haber un objeto Player");
+        assertInstanceOf(Shot.class, board.getShot(), "Debe haber un objeto Shot");
+    }
+
+    private void tickOnce() {
+        Timer t = board.getTimer();
+        assertNotNull(t, "El Timer de Board no debería ser null");
+        ActionListener[] listeners = t.getActionListeners();
+        assertTrue(listeners.length > 0, "El Timer debería tener al menos un ActionListener");
+        listeners[0].actionPerformed(new ActionEvent(t, ActionEvent.ACTION_PERFORMED, "test"));
     }
 
     // ------------------- PRUEBAS DE update() (caja negra por ciclo) -------------------
