@@ -145,8 +145,10 @@ class PlayerTest {
         assertTrue(stoppedX < finalX, "El jugador debería seguir moviendose");
     }
 
+    /*Test para el método act()*/
+
     @Test
-    void fueraLimiteIzqTest() {
+    void fueraLimiteIzqActTest() {
         player.setX(-2);
         player.setDx(-2);
         player.act();
@@ -154,7 +156,7 @@ class PlayerTest {
     }
 
     @Test
-    void limiteIzqTest() {
+    void limiteIzqActTest() {
         player.setX(0);
         player.setDx(-2);
         player.act();
@@ -162,15 +164,15 @@ class PlayerTest {
     }
 
     @Test
-    void porDebajoLimiteIzqTest() {
-        player.setX(2);
+    void porDebajoLimiteIzqActTest() {
+        player.setX(1);
         player.setDx(-2);
         player.act();
         assertTrue(player.getX() > 0);
     }
 
     @Test
-    void valorNominalTest() {
+    void valorNominalActTest() {
         player.setX(179);
         player.setDx(-2);
         player.act();
@@ -178,15 +180,15 @@ class PlayerTest {
     }
 
     @Test
-    void porDebajoLimiteDer() {
-        player.setX(356);
+    void porDebajoLimiteActDer() {
+        player.setX(357);
         player.setDx(2);
         player.act();
         assertTrue(player.getX() < 358);
     }
 
     @Test
-    void limiteDerTest() {
+    void limiteDerActTest() {
         player.setX(358);
         player.setDx(2);
         player.act();
@@ -194,7 +196,7 @@ class PlayerTest {
     }
 
     @Test
-    void fueraLimiteDerTest() {
+    void fueraLimiteDerActTest() {
         player.setX(360);
         player.setDx(2);
         player.act();
