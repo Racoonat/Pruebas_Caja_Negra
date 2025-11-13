@@ -212,4 +212,17 @@ class AlienTest {
         assertEquals(expectedY, alien.getY(),
                 label + " → Y final incorrecta tras la secuencia");
     }
+
+    /*Test para bomb()*/
+    @ParameterizedTest
+    @CsvSource(value = {
+    "-2,175", "0,175", "2,175", "179,175", "356,175", "358,175", "360,175",
+    "179,-1", "179,0", "179,1", "179,349", "179,350", "179,351"
+    })
+    void bombTest(int x, int y) {
+        Alien.Bomb bomb = new Alien(Commons.BOARD_WIDTH/2,Commons.BOARD_HEIGHT/2).new Bomb(x,y);
+        boolean insideWidthRange = bomb.getX() >= 0 && bomb.getX() <= Commons.BOARD_WIDTH;
+        boolean insideHeightRange = bomb.getY() >= 0 && bomb.getY() <= Commons.BOARD_HEIGHT;
+        assertTrue(insideWidthRange && insideHeightRange);
+    }
 }

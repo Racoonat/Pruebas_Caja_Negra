@@ -5,6 +5,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import space_invaders.sprites.Player;
 
 import java.awt.*;
@@ -146,60 +149,14 @@ class PlayerTest {
     }
 
     /*Test para el método act()*/
-
-    @Test
-    void fueraLimiteIzqActTest() {
-        player.setX(-2);
-        player.setDx(-2);
-        player.act();
-        assertTrue(player.getX() > 0);
-    }
-
-    @Test
-    void limiteIzqActTest() {
-        player.setX(0);
-        player.setDx(-2);
-        player.act();
-        assertTrue(player.getX() > 0);
-    }
-
-    @Test
-    void porDebajoLimiteIzqActTest() {
-        player.setX(1);
-        player.setDx(-2);
-        player.act();
-        assertTrue(player.getX() > 0);
-    }
-
-    @Test
-    void valorNominalActTest() {
-        player.setX(179);
-        player.setDx(-2);
+    @ParameterizedTest
+    @CsvSource(value = {
+            "-1,-2", "0,-2", "1,-2", "179,-2", "357,2", "358,2", "359,2"
+    })
+    void actTest(int x, int dx) {
+        player.setX(x);
+        player.setDx(dx);
         player.act();
         assertTrue(player.getX() > 0 && player.getX() < 358);
-    }
-
-    @Test
-    void porDebajoLimiteActDer() {
-        player.setX(357);
-        player.setDx(2);
-        player.act();
-        assertTrue(player.getX() < 358);
-    }
-
-    @Test
-    void limiteDerActTest() {
-        player.setX(358);
-        player.setDx(2);
-        player.act();
-        assertTrue(player.getX() < 358);
-    }
-
-    @Test
-    void fueraLimiteDerActTest() {
-        player.setX(360);
-        player.setDx(2);
-        player.act();
-        assertTrue(player.getX() < 358);
     }
 }
