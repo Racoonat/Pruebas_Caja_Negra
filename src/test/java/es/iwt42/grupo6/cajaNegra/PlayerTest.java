@@ -16,9 +16,12 @@ class PlayerTest {
 
      // Componente falso y final que se usa para poder crear un objeto KeyEvent.
     private final Component dummyComponent = new Component() {};
+    private Player player;
 
     @BeforeEach
     void setUp() {
+        player = new Player();
+
     }
 
     @AfterEach
@@ -29,7 +32,6 @@ class PlayerTest {
 
     @Test
     void testInitPlayer_Centrado() {
-        Player player = new Player();
         // ancho tablero par
         int expectedX = Commons.BOARD_WIDTH / 2; // centrado
         int expectedY = Commons.GROUND - 10; // 10 px sobre el suelo
@@ -44,7 +46,6 @@ class PlayerTest {
         int boardWidthOdd = Commons.BOARD_WIDTH + 1; // simulamos ancho impar
         int expectedX = boardWidthOdd / 2; // centrado visualmente
         int expectedY = Commons.GROUND - 10; // 10 px sobre el suelo
-        Player player = new Player(); // initPlayer() usa BOARD_WIDTH real
         // comprobamos que la X calculada sigue estando centrada
         assertTrue(Math.abs(player.getX() - expectedX) <= 1,
                 "X inicial del jugador incorrecto (TS2, ancho impar)");
@@ -55,13 +56,9 @@ class PlayerTest {
 
     // Pruebas del método keyPressed() ------
 
-   
-
-
     @Test
     @DisplayName("CP-P-: Pulsar flecha izquierda causa movimiento a la izquierda")
     void testKeyPressed_CausesLeftMovement() {
-        Player player = new Player();
         KeyEvent pressLeft = new KeyEvent(dummyComponent, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_LEFT, ' ');
         int initialX = player.getX();
         player.keyPressed(pressLeft);
@@ -73,7 +70,6 @@ class PlayerTest {
     @Test
     @DisplayName("CP-P-: Pulsar flecha derecha establece x a 2")
     void testKeyPressed_Right() {
-        Player player = new Player();
         KeyEvent pressRight = new KeyEvent(dummyComponent, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_RIGHT, ' ');
         int initialX = player.getX();
         player.keyPressed(pressRight);
@@ -85,7 +81,6 @@ class PlayerTest {
     @Test
     @DisplayName("CP-P-: Pulsar otra tecla (espacio) no debe cambiar dx")
     void testKeyPressed_OtherKey() {
-        Player player = new Player();
         KeyEvent pressSpace = new KeyEvent(dummyComponent, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_SPACE, ' ');
         int initialX = player.getX();
         player.keyPressed(pressSpace);
@@ -99,7 +94,6 @@ class PlayerTest {
     @Test
     @DisplayName("CP-P-: Soltar flecha izquierda detiene el movimiento")
     void testKeyReleased_Left() {
-        Player player = new Player();
         KeyEvent pressLeft = new KeyEvent(dummyComponent, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_LEFT, ' ');
         KeyEvent releaseLeft = new KeyEvent(dummyComponent, KeyEvent.KEY_RELEASED, 0, 0, KeyEvent.VK_LEFT, ' ');
 
@@ -118,7 +112,6 @@ class PlayerTest {
     @Test
     @DisplayName("CP-P-: Soltar flecha derecha detiene el movimiento")
     void testKeyReleased_Right() {
-        Player player = new Player();
         KeyEvent pressRight = new KeyEvent(dummyComponent, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_RIGHT, ' ');
         KeyEvent releaseRight = new KeyEvent(dummyComponent, KeyEvent.KEY_RELEASED, 0, 0, KeyEvent.VK_RIGHT, ' ');
 
@@ -137,7 +130,6 @@ class PlayerTest {
     @Test
     @DisplayName("CP-P-: Soltar otra tecla (espacio) no debe detener el movimiento")
     void testKeyReleased_OtherKey() {
-        Player player = new Player();
         KeyEvent pressRight = new KeyEvent(dummyComponent, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_RIGHT, ' ');
         KeyEvent releaseRight = new KeyEvent(dummyComponent, KeyEvent.KEY_RELEASED, 0, 0, KeyEvent.VK_SPACE, ' ');
 
@@ -151,5 +143,61 @@ class PlayerTest {
         int finalX = player.getX();
 
         assertTrue(stoppedX < finalX, "El jugador debería seguir moviendose");
+    }
+
+    @Test
+    void fueraLimiteIzqTest() {
+        player.setX(-2);
+        player.setDx(-2);
+        player.act();
+        assertTrue(player.getX() > 0);
+    }
+
+    @Test
+    void limiteIzqTest() {
+        player.setX(0);
+        player.setDx(-2);
+        player.act();
+        assertTrue(player.getX() > 0);
+    }
+
+    @Test
+    void porDebajoLimiteIzqTest() {
+        player.setX(2);
+        player.setDx(-2);
+        player.act();
+        assertTrue(player.getX() > 0);
+    }
+
+    @Test
+    void valorNominalTest() {
+        player.setX(179);
+        player.setDx(-2);
+        player.act();
+        assertTrue(player.getX() > 0 && player.getX() < 358);
+    }
+
+    @Test
+    void porDebajoLimiteDer() {
+        player.setX(356);
+        player.setDx(2);
+        player.act();
+        assertTrue(player.getX() < 358);
+    }
+
+    @Test
+    void limiteDerTest() {
+        player.setX(358);
+        player.setDx(2);
+        player.act();
+        assertTrue(player.getX() < 358);
+    }
+
+    @Test
+    void fueraLimiteDerTest() {
+        player.setX(360);
+        player.setDx(2);
+        player.act();
+        assertTrue(player.getX() < 358);
     }
 }
