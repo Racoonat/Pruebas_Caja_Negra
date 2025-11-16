@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import space_invaders.sprites.Alien;
 import space_invaders.sprites.Player;
+import space_invaders.sprites.Shot;
+import space_invaders.sprites.Sprite;
 
 import javax.swing.Timer;
 import java.awt.Component;
@@ -34,6 +36,24 @@ class BoardTest {
         Method method = Board.class.getDeclaredMethod("update_aliens");
         method.setAccessible(true);
         method.invoke(instance);
+    }
+
+    private void invokePrivateUpdateBomb(Board instance) throws Exception {
+        Method method = Board.class.getDeclaredMethod("update_bomb");
+        method.setAccessible(true);
+        method.invoke(instance);
+    }
+
+    private void invokePrivateUpdateShots(Board instance) throws Exception {
+        Method method = Board.class.getDeclaredMethod("update_shots");
+        method.setAccessible(true);
+        method.invoke(instance);
+    }
+
+    private void invokeProtectedSetVisible(Sprite instance, boolean visible) throws Exception {
+        Method method = Sprite.class.getDeclaredMethod("setVisible", boolean.class);
+        method.setAccessible(true);
+        method.invoke(instance, visible);
     }
 
     @BeforeEach
@@ -210,5 +230,85 @@ class BoardTest {
         assertEquals(115, alienMedio.getY());
 
         assertEquals("Invasion!", board.getMessage());
+    }
+
+    @Test
+    @DisplayName("update_shots Path 1")
+    void testUpdateShots_Path1() throws Exception {
+        Shot shot = new Shot(1, 1);
+        shot.setDying(false);
+        invokeProtectedSetVisible(shot, true);
+        board.setShot(shot);
+        Alien alien = new Alien(shot.getX(), shot.getY());
+        alien.setDying(false);
+        invokeProtectedSetVisible(alien, true);
+        board.setAliens(List.of(alien));
+        int initDeaths = board.getDeaths();
+
+        invokePrivateUpdateShots(board);
+
+        assertTrue(alien.isDying(), "El alien deberia morir despues de ser disparado");
+        assertEquals(initDeaths+1, board.getDeaths(), "El contador de muertes deberia haber aumentado");
+        assertFalse(shot.isVisible(), "El disparo deberia desaparecer al llegar arriba del tablero");
+    }
+
+    @Test
+    @DisplayName("update_shots Path 2")
+    void testUpdateShots_Path2() throws Exception {
+        Shot shot = new Shot(1, 1);
+        shot.setDying(false);
+        invokeProtectedSetVisible(shot, true);
+        board.setShot(shot);
+        Alien alien = new Alien(100, 100);
+        alien.setDying(false);
+        invokeProtectedSetVisible(alien, true);
+        board.setAliens(List.of(alien));
+        int initDeaths = board.getDeaths();
+
+        invokePrivateUpdateShots(board);
+
+        assertFalse(alien.isDying(), "El alien no deberia morir despues de no ser disparado");
+        assertEquals(initDeaths, board.getDeaths(), "El contador de muertes no deberia haber aumentado");
+        assertFalse(shot.isVisible(), "El disparo deberia desaparecer al llegar arriba del tablero");
+    }
+
+    @Test
+    @DisplayName("update_shots Path 3")
+    void testUpdateShots_Path3() throws Exception {
+        Shot shot = new Shot(1, 1);
+        shot.setDying(false);
+        invokeProtectedSetVisible(shot, true);
+        board.setShot(shot);
+        Alien alien = new Alien(100, 100);
+        alien.setDying(false);
+        invokeProtectedSetVisible(alien, false);
+        board.setAliens(List.of(alien));
+        int initDeaths = board.getDeaths();
+
+        invokePrivateUpdateShots(board);
+
+        assertFalse(alien.isDying(), "El alien no deberia morir despues de no ser disparado");
+        assertEquals(initDeaths, board.getDeaths(), "El contador de muertes no deberia haber aumentado");
+        assertFalse(shot.isVisible(), "El disparo deberia desaparecer al llegar arriba del tablero");
+    }
+
+    @Test
+    @DisplayName("update_shots Path 4")
+    void testUpdateShots_Path4() throws Exception {
+        Shot shot = new Shot(100, 100);
+        shot.setDying(false);
+        invokeProtectedSetVisible(shot, true);
+        board.setShot(shot);
+        Alien alien = new Alien(1, 1);
+        alien.setDying(false);
+        invokeProtectedSetVisible(alien, false);
+        board.setAliens(List.of(alien));
+        int initDeaths = board.getDeaths();
+
+        invokePrivateUpdateShots(board);
+
+        assertFalse(alien.isDying(), "El alien no deberia morir despues de no ser disparado");
+        assertEquals(initDeaths, board.getDeaths(), "El contador de muertes no deberia haber aumentado");
+        assertTrue(shot.isVisible(), "El disparo no deberia desaparecer");
     }
 }

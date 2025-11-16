@@ -236,4 +236,100 @@ class BoardTest {
         assertEquals(yVisibleBefore + 15, visibleMid.getY(),
                 "El alien visible debe bajar 15px por borde");
     }
+
+    @Test
+    @DisplayName("CP-B-10: Inicializacion bomba")
+    void testUpdateBomb_initBomb() {
+        Alien alien = new Alien(Commons.BOARD_WIDTH/2, Commons.BOARD_HEIGHT/2);
+        ArrayList<Alien> aliens = new ArrayList<>();
+        aliens.add(alien);
+        board.setAliens(aliens);
+
+        assertEquals(alien.getX(), alien.getBomb().getX(), "Las coordenadas iniciales de la bomba tienen que ser las del alien");
+        assertEquals(alien.getY(), alien.getBomb().getY(), "Las coordenadas iniciales de la bomba tienen que ser las del alien");
+        assertFalse(alien.getBomb().isDestroyed(), "El estado inicial de la bomba tiene que ser destroyed == false");
+    }
+
+    @Test
+    @DisplayName("CP-B-11: Bomba llega al final del tablero")
+    void testUpdateBomb_bombReachedGround() {
+        Alien alien = new Alien(Commons.BOARD_WIDTH/2, Commons.BOARD_HEIGHT - Commons.BOMB_HEIGHT);
+        ArrayList<Alien> aliens = new ArrayList<>();
+        aliens.add(alien);
+        board.setAliens(aliens);
+
+        tickOnce();
+
+        assertTrue(alien.getBomb().isDestroyed(), "La bomba debe de explotar cuando llegue abajo del tablero");
+    }
+
+    @Test
+    @DisplayName("CP-B-12: Bomba no llega al final del tablero")
+    void testUpdateBomb_bombDidntReachGround() {
+        Alien alien = new Alien(Commons.BOARD_WIDTH/2, Commons.BOARD_HEIGHT - Commons.BOMB_HEIGHT - 10);
+        ArrayList<Alien> aliens = new ArrayList<>();
+        aliens.add(alien);
+        board.setAliens(aliens);
+
+        tickOnce();
+
+        assertFalse(alien.getBomb().isDestroyed(), "La bomba no debe de explotar antes de lleguar abajo del tablero");
+        assertEquals(alien.getX(), alien.getBomb().getX(), "La bomba no debe de moverse horizontalmente");
+        assertTrue(alien.getY() < alien.getBomb().getY(), "La bomba debe de moverse verticalmente");
+    }
+
+    @Test
+    @DisplayName("CP-B-13: Jugador alcanzado por bomba")
+    void testUpdateBomb_bombReachedPlayer() {
+        Player player = new Player();
+        board.setPlayer(player);
+        Alien alien = new Alien(player.getX(), player.getY());
+        ArrayList<Alien> aliens = new ArrayList<>();
+        aliens.add(alien);
+        board.setAliens(aliens);
+
+        tickOnce();
+
+        assertTrue(alien.getBomb().isDestroyed(), "La bomba debe explotar al tocar al jugador");
+        assertTrue(player.isDying(), "El jugador debe morir al tocar una bomba");
+    }
+
+    @Test
+    @DisplayName("CP-B-14: Disparar a alienigena")
+    void testUpdateShots_alienGotShot() {
+        Alien alien = new Alien(Commons.BOARD_WIDTH/2, Commons.BOARD_HEIGHT/2);
+        ArrayList<Alien> aliens = new ArrayList<>();
+        aliens.add(alien);
+        board.setAliens(aliens);
+        Shot shot = new Shot(alien.getX(), alien.getY());
+        board.setShot(shot);
+        int initialDeaths = board.getDeaths();
+
+        tickOnce();
+
+        assertTrue(alien.isDying(), "El alien deberia morir cuando toca un disparo");
+        assertEquals(initialDeaths+1, board.getDeaths(), "El contador de muertes deberia haber aumentado por 1 al matar un alien");
+        assertFalse(board.getAliens().contains(alien), "El alien se deberia eliminar del tablero al morir");
+    }
+
+    @Test
+    @DisplayName("CP-B-15: No disparar a alienigena")
+    void testUpdateShots_alienDidntGetShot() {
+        Alien alien = new Alien(10, 10);
+        ArrayList<Alien> aliens = new ArrayList<>();
+        aliens.add(alien);
+        board.setAliens(aliens);
+        Shot shot = new Shot(Commons.BOARD_WIDTH - 10, Commons.BOARD_HEIGHT - 10);
+        board.setShot(shot);
+        int initShotX = board.getShot().getX(), initShotY = board.getShot().getY();
+        int initialDeaths = board.getDeaths();
+
+        tickOnce();
+
+        assertFalse(alien.isDying(), "El alien no deberia morir si no ha sido disparado");
+        assertEquals(initialDeaths, board.getDeaths(), "El contador de muertes no deberia haber aumentado al no matar a un alien");
+        assertTrue(board.getAliens().contains(alien), "El alien deberia seguir en el tablero");
+        assertEquals(initShotX, board.getShot().getX(), "El disparo no deberia haberse movido horizontalmente");
+        assertTrue(board.getShot().getY() < initShotY, "El disparo deberia haberse movido verticalmente hacia arriba");
+    }
 }
