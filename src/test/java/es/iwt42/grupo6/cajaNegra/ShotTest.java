@@ -112,7 +112,6 @@ class ShotTest implements Commons {
             "150, 150, 'SI10: Valores normales dentro del tablero'"
     })
 
-
     void testInitShotRobustBoundary(int x, int y) {
 
         // Posición final del disparo tras aplicar el desplazamiento

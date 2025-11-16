@@ -4,6 +4,8 @@ package es.iwt42.grupo6.cajaBlanca;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import space_invaders.sprites.Player;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -111,4 +113,14 @@ class PlayerTest {
         assertEquals(2, player.getDx(), "dx no debe cambiar para teclas sin acción");
     }
 
+    @ParameterizedTest
+    @CsvSource(value = {
+            "179,-2", "-1,-2", "359,2",
+    })
+    void actTest(int x, int dx) {
+        player.setX(x);
+        player.setDx(dx);
+        player.act();
+        assertTrue(player.getX() > 0 && player.getX() < 358);
+    }
 }

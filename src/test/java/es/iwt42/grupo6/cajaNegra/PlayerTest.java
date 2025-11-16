@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import space_invaders.sprites.Player;
 
 import java.awt.*;
@@ -24,15 +23,9 @@ class PlayerTest {
     @BeforeEach
     void setUp() {
         player = new Player();
-
-    }
-
-    @AfterEach
-    void tearDown() {
     }
 
     //Pruebas del método initPlayer ------
-
     @Test
     void testInitPlayer_Centrado() {
         // ancho tablero par
@@ -41,7 +34,6 @@ class PlayerTest {
         assertEquals(expectedX, player.getX(), "X inicial del jugador incorrecto (TS1)");
         assertEquals(expectedY, player.getY(), "Y inicial del jugador incorrecto (TS1)");
     }
-
 
     @Test
     void testInitPlayer_CentradoImpar() {
@@ -54,8 +46,6 @@ class PlayerTest {
                 "X inicial del jugador incorrecto (TS2, ancho impar)");
         assertEquals(expectedY, player.getY(), "Y inicial del jugador incorrecto (TS2)");
     }
-
-
 
     // Pruebas del método keyPressed() ------
 
@@ -93,7 +83,6 @@ class PlayerTest {
     }
 
     // --- Pruebas del método keyReleased() ------
-
     @Test
     @DisplayName("CP-P-: Soltar flecha izquierda detiene el movimiento")
     void testKeyReleased_Left() {

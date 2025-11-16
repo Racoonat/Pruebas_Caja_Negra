@@ -2,8 +2,11 @@
 package es.iwt42.grupo6.cajaBlanca;
 
 
+import main.Commons;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import space_invaders.sprites.Alien;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,5 +77,16 @@ public class AlienTest {
             // La referencia devuelta debe ser estable (misma instancia)
             assertSame(bomb, alien.getBomb(), "getBomb() debería devolver siempre la misma instancia de Bomb");
         }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "179,175", "360,175", "179,351"
+    })
+    void bombTest(int x, int y) {
+        Alien.Bomb bomb = new Alien(Commons.BOARD_WIDTH/2,Commons.BOARD_HEIGHT/2).new Bomb(x,y);
+        boolean insideWidthRange = bomb.getX() >= 0 && bomb.getX() <= Commons.BOARD_WIDTH;
+        boolean insideHeightRange = bomb.getY() >= 0 && bomb.getY() <= Commons.BOARD_HEIGHT;
+        assertTrue(insideWidthRange && insideHeightRange);
     }
+}
 

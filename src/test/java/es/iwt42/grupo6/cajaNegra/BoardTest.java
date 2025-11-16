@@ -30,6 +30,7 @@ class BoardTest {
         board.setDeaths(0);
     }
 
+    //Test de Board() e initBoard()
     @Test
     void initBoardTest() {
 
