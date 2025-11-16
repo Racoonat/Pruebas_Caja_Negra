@@ -1,6 +1,7 @@
 package es.iwt42.grupo6.cajaNegra;
 
 import main.Board;
+import main.Commons;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,25 +34,23 @@ class BoardTest {
     //Test de Board() e initBoard()
     @Test
     void initBoardTest() {
+        int k = 0;
 
         assertNotNull(board, "El objeto Board no debe ser nulo");
-
-        // Validar que los componentes principales estén inicializados
         assertNotNull(board.getAliens(), "La lista de aliens debe estar inicializada");
         assertNotNull(board.getPlayer(), "El jugador debe estar inicializado");
         assertNotNull(board.getShot(), "El disparo debe estar inicializado");
-
-        // Verificar cantidad inicial de aliens
         assertEquals(24, board.getAliens().size(), "Debe haber 24 aliens iniciales (4x6)");
 
-        // Verificar tipo de objetos
-        for (Object obj : board.getAliens()) {
-            assertInstanceOf(Alien.class, obj, "Cada elemento debe ser un Alien");
+        /*Comprobamos que el Alien se ha generado en las coordinadas correctas*/
+        for(int i = 0; i < Commons.ALIEN_ROWS; ++i) {
+            for(int j = 0; j < Commons.ALIEN_COLUMNS; ++j) {
+                assertEquals(Commons.ALIEN_INIT_X + Commons.ALIEN_SEPARATOR * j, board.getAliens().get(k).getX());
+                assertEquals(Commons.ALIEN_INIT_Y + Commons.ALIEN_SEPARATOR * i, board.getAliens().get(k).getY());
+                System.out.println("[" + board.getAliens().get(k).getX() + ", " + board.getAliens().get(k).getY() + "]");
+                k++;
+            }
         }
-
-        // El jugador y disparo deben existir
-        assertInstanceOf(Player.class, board.getPlayer(), "Debe haber un objeto Player");
-        assertInstanceOf(Shot.class, board.getShot(), "Debe haber un objeto Shot");
     }
 
     private void tickOnce() {
